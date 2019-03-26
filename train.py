@@ -2,6 +2,7 @@ import torch
 import torch.utils.data as data
 import torch.nn.functional as F
 import torch.optim as optim
+import numpy as np
 
 from src import model
 
@@ -41,13 +42,21 @@ for epoch in range(100):
 
     for x, y, valid in train_dataloader:
 
+        #Remove batch 1 dimension
         x = x.view(x.size()[1],x.size()[2],x.size()[3])
         y = y.view(y.size()[1])
-        valid = valid.view(valid.size()[1],-1)
+        valid = valid.view(valid.size()[1])
 
 
+        #Careful with the shape, should have shape num_steps
+        #We simply create a uniform growing series from 0 to 1
+        loss_scale = torch.from_numpy(np.linspace(0.0,1.0,valid.size()[0],dtype='float32'))
+        # Add fake last dimension to use expand
+        valid = torch.mul(valid, loss_scale).view(valid.size()[0],-1)
         #Valid is expanded, in blocks of J that hold the same value
         valid = valid.expand(-1,exp_players).contiguous().view(-1)
+
+
 
         #Repeat targets across timesteps
         y = y.repeat(exp_steps)
@@ -64,6 +73,7 @@ for epoch in range(100):
 
         loss = F.cross_entropy(net_output, y,reduction='none')
 
+        #Perhaps some sort of divsion should be applied here, /steps?
         cost = loss.sum()
 
         print(cost.double())
