@@ -9,7 +9,7 @@ from src import model
 
 use_cuda = torch.cuda.is_available()
 device = torch.device("cuda:0" if use_cuda else "cpu")
-
+UPDATE_FREQUENCY = 100
 
 net = model.Net({"n_features":512,"hidden_size":128,"linear_hidden_size":32,"n_roles":7}).to(device)
 
@@ -17,30 +17,30 @@ net = model.Net({"n_features":512,"hidden_size":128,"linear_hidden_size":32,"n_r
 exp_steps = 20
 exp_players = 15
 
-X = torch.randn((1,exp_players,exp_steps,512))
+X = torch.randn((1000,exp_players,exp_steps,512))
 
-Y = torch.randint(1,7,(1,exp_players))
+Y = torch.randint(1,7,(1000,exp_players))
 
-VALID_LOSS = torch.round(torch.rand((1,exp_steps)))
+VALID_LOSS = torch.round(torch.rand((1000,exp_steps)))
 
 
 
 train_dataset = data.TensorDataset(X,Y,VALID_LOSS)
+#Dataloader is an iterable
 train_dataloader = data.DataLoader(train_dataset)
 
-optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
+optimizer = optim.SGD(net.parameters(), lr=0.00001, momentum=0.0)
 
 for epoch in range(100):
     print('Epoch {}/{}'.format(epoch, 100 - 1))
     print('-' * 10)
-    # Training
 
 
-    running_loss = 0.0
-    running_corrects = 0
+    optimizer.zero_grad()
 
+    epoch_cost = 0
 
-    for x, y, valid in train_dataloader:
+    for index_batch, (x, y, valid) in enumerate(train_dataloader):
 
         #Remove batch 1 dimension
         x = x.view(x.size()[1],x.size()[2],x.size()[3])
@@ -65,7 +65,6 @@ for epoch in range(100):
 
         #Fix valid somewhere along here
 
-        optimizer.zero_grad()
         net_output = net.forward(x)
 
 
@@ -76,11 +75,19 @@ for epoch in range(100):
         #Perhaps some sort of divsion should be applied here, /steps?
         cost = loss.sum()
 
-        print(cost.double())
+        # Logging
+        epoch_cost += cost.detach().numpy()
 
         cost.backward()
-        optimizer.step()
 
+
+
+
+        if (index_batch + 1) % UPDATE_FREQUENCY == 0:
+          optimizer.step()
+          optimizer.zero_grad()
+
+    print(epoch_cost)
 
 
 
