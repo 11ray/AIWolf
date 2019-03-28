@@ -191,9 +191,9 @@ def generate_matrix(file, name, test=False):
 
             else:
 
-                np.save('data/mat'+name+'.x', np.array(game))
-                np.save('data/target' + name+'.y', np.array(target))
-                np.save('data/mask' + name + '.valid', np.array(mask))
+                np.save('data/gat2017log05_data/' + name + '.x', np.array(game))
+                np.save('data/gat2017log05_data/' + name + '.y', np.array(target))
+                np.save('data/gat2017log05_data/' + name + '.valid', np.array(mask))
     except:
         print("error")
 if __name__ == "__main__":
@@ -218,7 +218,7 @@ if __name__ == "__main__":
             else:
                 g = str(j)
 
-            ubi_file = 'gat2017log15/'+f+'/'+g+'.log'
+            ubi_file = 'gat2017log05/'+f+'/'+g+'.log'
 
             print("Obteniendo matriz a partir del fichero: ", ubi_file, ".....")
 
