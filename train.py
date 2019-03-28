@@ -8,18 +8,20 @@ from src import model,dataset
 
 
 use_cuda = torch.cuda.is_available()
-device = torch.device("cuda:0" if use_cuda else "cpu")
-UPDATE_FREQUENCY = 100
+#device = torch.device("cuda:0" if use_cuda else "cpu")
+device = torch.device("cpu")
+UPDATE_FREQUENCY = 32
+N_ROLES = 6
 
-net = model.Net({"n_features":512,"hidden_size":128,"linear_hidden_size":32,"n_roles":7}).to(device)
+net = model.Net({"n_features":22,"hidden_size":64,"linear_hidden_size":32,"n_roles":N_ROLES}).to(device)
 
-train_dataset = dataset.WerewolfDataset('data/synthetic/synthetic_train/set.csv')
+train_dataset = dataset.WerewolfDataset('data/gat2017log15_data/sets/train_file_list')
 train_dataloader = data.DataLoader(train_dataset)
 
-validation_dataset = dataset.WerewolfDataset('data/synthetic/synthetic_valid/set.csv')
+validation_dataset = dataset.WerewolfDataset('data/gat2017log15_data/sets/test_file_list')
 validation_dataloader = data.DataLoader(validation_dataset)
 
-optimizer = optim.SGD(net.parameters(), lr=0.00001, momentum=0.0)
+optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
 for epoch in range(100):
     print('Epoch {}/{}'.format(epoch, 100 - 1))
@@ -29,8 +31,6 @@ for epoch in range(100):
     optimizer.zero_grad()
     epoch_cost = 0
     for index_batch, (x, y, valid) in enumerate(train_dataloader):
-
-
 
         #Remove batch 1 dimension
         x = x.view(x.size()[1],x.size()[2],x.size()[3])
@@ -52,12 +52,13 @@ for epoch in range(100):
 
         x, y, valid = x.to(device), y.to(device), valid.to(device)
 
+
         #Fix valid somewhere along here
 
         net_output = net.forward(x)
 
 
-        net_output = net_output.permute(1,0,2).contiguous().view(-1,7)
+        net_output = net_output.permute(1,0,2).contiguous().view(-1,N_ROLES)
 
         loss = F.cross_entropy(net_output, y,reduction='none')
 
@@ -91,5 +92,4 @@ for epoch in range(100):
         correct += (predicted_roles == y).float().sum().numpy()[0]
 
     print("Validation accuracy :", correct / denominator)
-
 

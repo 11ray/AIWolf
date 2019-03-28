@@ -17,9 +17,9 @@ class WerewolfDataset(data.Dataset):
     basename = self.name_dataframe.iloc[idx][0]
 
 
-    x = torch.from_numpy(np.load(basename+".x.npy"))
-    y = torch.from_numpy(np.load(basename + ".y.npy"))
-    valid = torch.from_numpy(np.load(basename + ".valid.npy"))
+    x = torch.from_numpy(np.load(basename+".x.npy")).float()
+    y = torch.from_numpy(np.load(basename + ".y.npy")).long()
+    valid = torch.from_numpy(np.load(basename + ".valid.npy")).float()
 
 
     return (x,y,valid)
