@@ -8,18 +8,21 @@ from src import model,dataset
 
 
 use_cuda = torch.cuda.is_available()
+#device = torch.device("cpu")
 #device = torch.device("cuda:0" if use_cuda else "cpu")
-device = torch.device("cpu")
+#Only works if you have 2 GPUs
+device = torch.device("cuda:1" if use_cuda else "cpu")
+
 UPDATE_FREQUENCY = 32
 N_ROLES = 6
 
 net = model.Net({"n_features":22,"hidden_size":64,"linear_hidden_size":32,"n_roles":N_ROLES}).to(device)
 
 train_dataset = dataset.WerewolfDataset('data/gat2017log15_data/sets/train_file_list')
-train_dataloader = data.DataLoader(train_dataset)
+train_dataloader = data.DataLoader(train_dataset,num_workers=2)
 
 validation_dataset = dataset.WerewolfDataset('data/gat2017log15_data/sets/test_file_list')
-validation_dataloader = data.DataLoader(validation_dataset)
+validation_dataloader = data.DataLoader(validation_dataset,num_workers=2)
 
 optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
@@ -37,7 +40,8 @@ for epoch in range(100):
         y = y.view(y.size()[1])
         valid = valid.view(valid.size()[1])
 
-
+        
+        """"
         #Careful with the shape, should have shape num_steps
         #We simply create a uniform growing series from 0 to 1
         loss_scale = torch.from_numpy(np.linspace(0.0,1.0,valid.size()[0],dtype='float32'))
@@ -49,7 +53,9 @@ for epoch in range(100):
 
         #Repeat targets across timesteps
         y = y.repeat(x.size()[1])
-
+        """
+        
+                
         x, y, valid = x.to(device), y.to(device), valid.to(device)
 
 
@@ -66,7 +72,7 @@ for epoch in range(100):
         cost = loss.sum()
 
         # Logging
-        epoch_cost += cost.detach().numpy()
+        epoch_cost += cost.detach().cpu().numpy()
 
         cost.backward()
 
