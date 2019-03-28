@@ -6,11 +6,11 @@ class Net(nn.Module):
 
     def __init__(self,net_params):
         super(Net, self).__init__()
-        self.rnn = nn.GRU(batch_first=True,input_size=net_params["n_features"],hidden_size=net_params["hidden_size"])
+        self.rnn = nn.GRU(batch_first=True,input_size=net_params.event_vector_size,hidden_size=net_params.rnn_hidden_size)
         self.att_softmax = nn.Softmax(dim=1)
-        self.att_denom = torch.sqrt(torch.tensor(net_params["hidden_size"], dtype=torch.float32))
-        self.linear1 = nn.Linear(net_params["hidden_size"], net_params["linear_hidden_size"])
-        self.linear2 = nn.Linear(net_params["linear_hidden_size"],net_params["n_roles"])
+        self.att_denom = torch.sqrt(torch.tensor(net_params.rnn_hidden_size, dtype=torch.float32))
+        self.linear1 = nn.Linear(net_params.rnn_hidden_size, net_params.classifier_hidden_size)
+        self.linear2 = nn.Linear(net_params.classifier_hidden_size,net_params.n_roles)
 
     def forward(self, x):
         # Receives as input a  Tensor of shape (J,Steps,N_features)

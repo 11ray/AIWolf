@@ -24,7 +24,15 @@ class WerewolfDataset(data.Dataset):
     ###
     #Careful with the shape, should have shape num_steps
     #We simply create a uniform growing series from 0 to 1
-    loss_scale = torch.from_numpy(np.linspace(0.0,1.0,valid.size()[0],dtype='float32'))
+    
+    #Linear growing version
+    #loss_scale = torch.from_numpy(np.linspace(0.0,1.0,valid.size()[0],dtype='float32'))
+    
+    #Only at the end of the game version
+    scale_array = np.zeros(valid.size()[0],dtype='float32')
+    scale_array[-1]=1.0
+    loss_scale = torch.from_numpy(scale_array)
+    
     # Add fake last dimension to use expand
     valid = torch.mul(valid, loss_scale).view(valid.size()[0],-1)
     #Valid is expanded, in blocks of J that hold the same value
