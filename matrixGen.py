@@ -55,23 +55,25 @@ def generate_matrix(file, name, test=False):
             #print(game)
             target = []
             in_dia = 0
+
+            for k, v in dict['target'].items():
+                target.append(v)
+            tgt = []
+            enc = preprocessing.OrdinalEncoder()
+            X = np.array(target).reshape(-1, 1)
+            enc.fit(X)
+            for role in X:
+                va = np.array([role])
+                tgt.append(enc.transform(va))
+            target = []
+            for elem in tgt:
+                target.append(int(elem[0][0]))
+            num_roles = len(set(target))
+
             # clave-dia/target valor-tipo_accion{id}
             for key, value in dict.items():
-                if key == 'target':
-                    for k, v in dict['target'].items():
-                        target.append(v)
-                    tgt = []
-                    enc = preprocessing.OrdinalEncoder()
-                    X = np.array(target).reshape(-1, 1)
-                    enc.fit(X)
-                    for role in X:
-                        va = np.array([role])
-                        tgt.append(enc.transform(va))
-                    target = []
-                    for elem in tgt:
-                        target.append(int(elem[0][0]))
-                    num_roles = len(set(target))
-                else:
+
+                if key != 'target':
 
                     actions_day = 0
                     # clave-tipo_accion valor-id{sucesos}
@@ -262,9 +264,10 @@ def generate_matrix(file, name, test=False):
 
     except Exception as ex:
         print(ex)
+        exit()
 
 if __name__ == "__main__":
-    test = True
+    test = False
 
     for i in range(1000):
         for j in range(100):
