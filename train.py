@@ -8,6 +8,12 @@ import argparse
 
 from src import model,dataset,arguments
 
+
+l = [5, 5, 4, 2, 4, 5, 4, 4, 4, 4, 3, 4, 4, 0, 1]
+counts = np.array([1,1,1,1,8,3],dtype='float32')
+loss_weights = 1.0 / counts
+
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
@@ -21,7 +27,7 @@ if __name__ == "__main__":
 
     
     print("Training using device: ",device)
-
+    weights_t = torch.from_numpy(loss_weights).to(device)
 
     net = model.Net(args).to(device)
 
@@ -33,8 +39,8 @@ if __name__ == "__main__":
 
     optimizer = optim.SGD(net.parameters(), lr=0.0001, momentum=0.0)
 
-    for epoch in range(100):
-        print('Epoch {}/{}'.format(epoch, 100 - 1))
+    for epoch in range(10000):
+        print('Epoch {}/{}'.format(epoch, 10000 - 1))
         print('-' * 10)
 
         #Training
@@ -71,9 +77,12 @@ if __name__ == "__main__":
 
             net_output = net_output.permute(1,0,2).contiguous().view(-1,args.n_roles)
 
-            loss = F.cross_entropy(net_output, y,reduction='none')
+            loss = torch.mul(F.cross_entropy(net_output, y,reduction='none',weight=weights_t),valid)
 
-            cost = loss.sum() / x.size()[1]
+            cost = loss.sum() / args.update_frequency
+
+            if args.loss_scale != "last_step_only":
+                cost = cost / x.size()[1]
 
             # Logging
             epoch_cost += cost.detach().cpu().numpy()
@@ -98,13 +107,20 @@ if __name__ == "__main__":
             #Remove batch 1 dimension
             x = x.view(x.size()[1],x.size()[2],x.size()[3])
             y = y.view(y.size()[1])
-            valid = valid.view(valid.size()[1])
+            #valid = valid.view(valid.size()[1])
 
-            net_output = net.forward(x)
+            x, y  = x.to(device), y.to(device)
+
+            net_output = net.forward(x,device)
             predicted_roles = net_output[:,-1,:].argmax(dim=1)
 
+
             denominator+= predicted_roles.numel()
-            correct += (predicted_roles == y).float().sum().numpy()[0]
+            correct += (predicted_roles == y[-args.n_players:]).float().sum().detach().cpu().numpy()
+
+            if index_batch == 0:
+                print('Network output: ', predicted_roles)
+                print(", target:      ", y[-x.size()[0]:].cpu().numpy())
 
         print("Validation accuracy :", correct / denominator)
 

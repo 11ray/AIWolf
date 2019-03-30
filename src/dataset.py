@@ -38,8 +38,6 @@ class WerewolfDataset(data.Dataset):
         valid = torch.mul(valid, loss_scale).view(valid.size()[0],-1)
         #Valid is expanded, in blocks of J that hold the same value
         valid = valid.expand(-1,x.size()[0]).contiguous().view(-1)
-
-
         #Repeat targets across timesteps
         y = y.repeat(x.size()[1])
 

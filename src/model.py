@@ -10,7 +10,12 @@ class Net(nn.Module):
         self.att_softmax = nn.Softmax(dim=1)
         self.att_denom = torch.sqrt(torch.tensor(net_params.rnn_hidden_size, dtype=torch.float32))
         self.linear1 = nn.Linear(net_params.rnn_hidden_size, net_params.classifier_hidden_size)
-        self.output_layer = nn.Linear(net_params.classifier_hidden_size,net_params.n_roles)
+
+        if net_params.decoder_type == "concat_linear":
+            self.output_layer = nn.Linear(net_params.n_players * net_params.rnn_hidden_size + net_params.n_players , net_params.n_roles)
+        else:
+            self.output_layer = nn.Linear(net_params.classifier_hidden_size, net_params.n_roles)
+
         self.args = net_params
 
     def forward(self, x,device):
