@@ -19,4 +19,8 @@ def add_arguments(parser):
     parser.add_argument("--loss_scale",type=str,choices=["last_step_only","uniform","linearly_growing"],help="Type of loss used for training the model.")
     parser.add_argument("--log_frequency",type=int,default=100,help="Show training statistics every log_frequency updates")
     parser.add_argument("--gpu_device_number",type=int,required=False,default=-1,help="Ordinal device number of gpu. Negative number means use CPU")
-    
+    parser.add_argument("--train_file_list", type=str,help="File containing the paths of the training files (File list format: One file per line)")
+
+    # Validation
+    parser.add_argument("--validation_file_list", type=str,help="File containing the paths of the validation files (File list format: One file per line)")
+
