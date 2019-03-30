@@ -6,7 +6,10 @@ def add_arguments(parser):
     # Model parameters
     parser.add_argument("--event_vector_size",type=int,help="Size of each of the event vectors")
     parser.add_argument("--rnn_hidden_size",type=int,help="Hidden size of the RNN layers")
-    parser.add_argument("--classifier_hidden_size",type=int,help="Size of the classifier linear layers")
+    parser.add_argument("--encoder_type", type=str, choices=["rnn","rnn_selfattention"], help="Type of encoder architecture")
+    parser.add_argument("--decoder_type", type=str, choices=["linear", "concat_linear"],
+                        help="Type of decoder architecture")
+    parser.add_argument("--classifier_hidden_size",type=int,help="Size of the classifier layers")
     
     
     # Problem parameters

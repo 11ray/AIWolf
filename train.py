@@ -25,10 +25,10 @@ if __name__ == "__main__":
 
     net = model.Net(args).to(device)
 
-    train_dataset = dataset.WerewolfDataset(args.train_file_list)
+    train_dataset = dataset.WerewolfDataset(args.train_file_list,args)
     train_dataloader = data.DataLoader(train_dataset,num_workers=2)
 
-    validation_dataset = dataset.WerewolfDataset(args.validation_file_list)
+    validation_dataset = dataset.WerewolfDataset(args.validation_file_list,args)
     validation_dataloader = data.DataLoader(validation_dataset,num_workers=2)
 
     optimizer = optim.SGD(net.parameters(), lr=0.0001, momentum=0.0)
@@ -66,7 +66,7 @@ if __name__ == "__main__":
             x, y, valid = x.to(device), y.to(device), valid.to(device)
 
 
-            net_output = net.forward(x)
+            net_output = net.forward(x,device)
 
 
             net_output = net_output.permute(1,0,2).contiguous().view(-1,args.n_roles)
