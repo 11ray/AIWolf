@@ -7,11 +7,10 @@ import sys
 import argparse
 
 from src import model,dataset,arguments
+from paper_HAIA import compute_random_accuracy
 
 
-l = [5, 5, 4, 2, 4, 5, 4, 4, 4, 4, 3, 4, 4, 0, 1]
-counts = np.array([1,1,1,1,8,3],dtype='float32')
-loss_weights = 1.0 / counts
+
 
 
 if __name__ == "__main__":
@@ -19,6 +18,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     arguments.add_arguments(parser)
     args = parser.parse_args()
+
+
+
+
      
     device = torch.device("cpu")
     if (args.gpu_device_number >= 0):
@@ -27,6 +30,18 @@ if __name__ == "__main__":
 
     
     print("Training using device: ",device)
+
+    if args.loss_weights =="inverse_frequency":
+        l = [5, 5, 4, 2, 4, 5, 4, 4, 4, 4, 3, 4, 4, 0, 1]
+        #counts = np.array([1, 1, 1, 1, 8, 3], dtype='float32')
+        counts = np.array([12, 3], dtype='float32')
+        #loss_weights = 1.0 / counts
+        loss_weights = np.array([0.5,2.0], dtype='float32')
+
+    else:
+        loss_weights = np.ones(args.n_roles, dtype='float32')
+
+
     weights_t = torch.from_numpy(loss_weights).to(device)
 
     net = model.Net(args).to(device)
@@ -37,7 +52,7 @@ if __name__ == "__main__":
     validation_dataset = dataset.WerewolfDataset(args.validation_file_list,args)
     validation_dataloader = data.DataLoader(validation_dataset,num_workers=2)
 
-    optimizer = optim.SGD(net.parameters(), lr=0.0001, momentum=0.0)
+    optimizer = optim.SGD(net.parameters(), lr=0.01, weight_decay=0.001, momentum=0.0)
 
     for epoch in range(10000):
         print('Epoch {}/{}'.format(epoch, 10000 - 1))
@@ -77,6 +92,7 @@ if __name__ == "__main__":
 
             net_output = net_output.permute(1,0,2).contiguous().view(-1,args.n_roles)
 
+
             loss = torch.mul(F.cross_entropy(net_output, y,reduction='none',weight=weights_t),valid)
 
             cost = loss.sum() / args.update_frequency
@@ -93,7 +109,7 @@ if __name__ == "__main__":
                 if args.update_frequency > 0 and (index_batch + 1) % (args.update_frequency * args.log_frequency) == 0:
                     print('Train Epoch: {} [{}/{} ({:.0f}%)]\tCost: {:.6f}'.format(epoch, index_batch, len(train_dataloader),100. * index_batch / len(train_dataloader), cost.item()))
                     print('Network output: ', net_output[-x.size()[0]:,:].argmax(dim=1).detach().cpu().numpy())
-                    print( ", target:      ", y[-x.size()[0]:].cpu().numpy())
+                    print(', target:       ', y[-x.size()[0]:].cpu().numpy())
                 optimizer.step()
                 optimizer.zero_grad()
 
@@ -101,8 +117,10 @@ if __name__ == "__main__":
         print("Train cost/batch :", epoch_cost / len(train_dataloader))
 
         # Validation
-        correct = 0
-        denominator = 0
+        predicted_l = []
+        true_l = []
+
+
         for index_batch, (x, y, valid) in enumerate(validation_dataloader):
             #Remove batch 1 dimension
             x = x.view(x.size()[1],x.size()[2],x.size()[3])
@@ -114,13 +132,12 @@ if __name__ == "__main__":
             net_output = net.forward(x,device)
             predicted_roles = net_output[:,-1,:].argmax(dim=1)
 
+            predicted_l.append(predicted_roles.detach().cpu().numpy())
+            true_l.append(y[-args.n_players:].detach().cpu().numpy())
 
-            denominator+= predicted_roles.numel()
-            correct += (predicted_roles == y[-args.n_players:]).float().sum().detach().cpu().numpy()
 
-            if index_batch == 0:
-                print('Network output: ', predicted_roles)
-                print(", target:      ", y[-x.size()[0]:].cpu().numpy())
+        print(compute_random_accuracy.compute_2class_stats(np.array(true_l).flatten(),np.array(predicted_l).flatten()))
 
-        print("Validation accuracy :", correct / denominator)
+
+
 

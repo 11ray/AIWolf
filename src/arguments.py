@@ -15,12 +15,14 @@ def add_arguments(parser):
     # Problem parameters
     parser.add_argument("--n_players",type=int,help="Number of players in the game")
     parser.add_argument("--n_roles",type=int,help="Number of possible roles (classes)")
+    parser.add_argument("--reduce_classes", dest='reduce_classes', default=False, action='store_true')
 
 
     # Training
     parser.add_argument("--update_frequency",type=int,help="Gradient accomulation.Simulates batch size")
     parser.add_argument("--loss_scale",type=str,choices=["last_step_only","uniform","linearly_growing"],help="Type of loss used for training the model.")
-    parser.add_argument("--log_frequency",type=int,default=100,help="Show training statistics every log_frequency updates")
+    parser.add_argument("--loss_weights",type=str,choices=["uniform","inverse_frequency"])
+    parser.add_argument("--log_frequency",type=int,default=100,required=False,help="Show training statistics every log_frequency updates")
     parser.add_argument("--gpu_device_number",type=int,required=False,default=-1,help="Ordinal device number of gpu. Negative number means use CPU")
     parser.add_argument("--train_file_list", type=str,help="File containing the paths of the training files (File list format: One file per line)")
 

@@ -12,9 +12,9 @@ class Net(nn.Module):
         self.linear1 = nn.Linear(net_params.rnn_hidden_size, net_params.classifier_hidden_size)
 
         if net_params.decoder_type == "concat_linear":
-            self.output_layer = nn.Linear(net_params.n_players * net_params.rnn_hidden_size + net_params.n_players , net_params.n_roles)
+            self.output_layer = nn.Linear(net_params.n_players * net_params.rnn_hidden_size + net_params.n_players , net_params.n_roles,bias=False)
         else:
-            self.output_layer = nn.Linear(net_params.classifier_hidden_size, net_params.n_roles)
+            self.output_layer = nn.Linear(net_params.classifier_hidden_size, net_params.n_roles,bias=False)
 
         self.args = net_params
 

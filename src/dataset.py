@@ -10,6 +10,12 @@ class WerewolfDataset(data.Dataset):
         self.name_dataframe = pd.read_csv(name_filelist)
         self.args = args
 
+    def compress_classes(self,x):
+        if x == 5:
+            return 1
+        else:
+            return 0
+
     def __len__(self):
         return len(self.name_dataframe)
 
@@ -18,7 +24,14 @@ class WerewolfDataset(data.Dataset):
 
 
         x = torch.from_numpy(np.load(basename+".x.npy")).float()
-        y = torch.from_numpy(np.load(basename + ".y.npy")).long()
+
+        if self.args.reduce_classes:
+            tmp = np.load(basename + ".y.npy")
+            y = torch.from_numpy(np.array([self.compress_classes(xi) for xi in tmp])).long()
+
+        else:
+            y = torch.from_numpy(np.load(basename + ".y.npy")).long()
+
         valid = torch.from_numpy(np.load(basename + ".valid.npy")).float()
 
 
