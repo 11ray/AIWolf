@@ -14,10 +14,20 @@ def get_id(lines,n_players):
     return s
         
 
-def generate_player_game_list(basename,agent_id,values):
-    with open(basename+"/" + agent_id + ".set" ,'w') as f:
-        for game,id in values:
-            print( ",".join([os.path.abspath(basename+game),id]),file=f)
+def generate_player_game_list(basename,agent_id,values,split=False):
+    if split:
+        with open(basename+"/" + agent_id + ".train.set" ,'w') as f:
+            for game,id in values[:int(len(values)*0.8)]:
+                print( ",".join([os.path.abspath(basename+game),id]),file=f)
+
+        with open(basename+"/" + agent_id + ".test.set" ,'w') as f:
+            for game,id in values[int(len(values)*0.8):]:
+                print( ",".join([os.path.abspath(basename+game),id]),file=f)
+
+    else:
+        with open(basename+"/" + agent_id + ".set" ,'w') as f:
+            for game,id in values:
+                print( ",".join([os.path.abspath(basename+game),id]),file=f)
         
 if __name__ == "__main__":
     agent_dataset_dict = {}
@@ -42,5 +52,5 @@ if __name__ == "__main__":
 
     for agent_id in list(agent_dataset_dict.keys()):
         if not agent_id.startswith('Dummy'):
-            generate_player_game_list('data/gat2017log15_data/',agent_id,agent_dataset_dict[agent_id])
+            generate_player_game_list('data/gat2017log15_data/',agent_id,agent_dataset_dict[agent_id],split=True)
 

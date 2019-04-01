@@ -23,14 +23,14 @@ class IndividualWerewolfDataset(data.Dataset):
         basename = self.name_dataframe.iloc[idx][0]
         row = self.name_dataframe.iloc[idx][1]
 
-        x = torch.from_numpy(np.load(basename+".x.npy")[row]).float()
+        x = torch.from_numpy(np.load(basename+".x.npy")[row-1]).float()
 
         if self.args.reduce_classes:
-            tmp = np.load(basename + ".y.npy")[row]
+            tmp = np.load(basename + ".y.npy")[row-1]
             y = torch.from_numpy(np.array([self.compress_classes(xi) for xi in tmp])).long()
 
         else:
-            y = torch.from_numpy(np.array(np.load(basename + ".y.npy")[row])).long()
+            y = torch.from_numpy(np.array(np.load(basename + ".y.npy")[row-1])).long()
 
 
         return (x,y)

@@ -5,10 +5,10 @@ python train_individual.py --event_vector_size 36 \
 --decoder_type concat_linear \
 --n_players 15 \
 --n_roles 6 \
---train_file_list data/gat2017log15_data/wasabi.set \
---validation_file_list data/gat2017log15_data/wasabi.set \
+--train_file_list data/gat2017log15_data/wasabi.train_10000.set \
+--validation_file_list data/gat2017log15_data/wasabi.test_1000.set \
 --update_frequency 64 \
 --loss_scale last_step_only \
 --loss_weights uniform \
 --gpu_device_number 0 \
---log_frequency 10
+--log_frequency 100

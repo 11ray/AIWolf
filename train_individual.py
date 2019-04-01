@@ -26,12 +26,12 @@ if __name__ == "__main__":
   net = individual_model.Net(args).to(device)
 
   train_dataset = individual_dataset.IndividualWerewolfDataset(args.train_file_list, args)
-  train_dataloader = data.DataLoader(train_dataset, num_workers=2,batch_size=1)
+  train_dataloader = data.DataLoader(train_dataset, num_workers=3,batch_size=1)
 
   validation_dataset = individual_dataset.IndividualWerewolfDataset(args.validation_file_list, args)
-  validation_dataloader = data.DataLoader(validation_dataset, num_workers=2,batch_size=1)
+  validation_dataloader = data.DataLoader(validation_dataset, num_workers=3,batch_size=1)
 
-  optimizer = optim.SGD(net.parameters(), lr=0.01, weight_decay=0.001, momentum=0.0)
+  optimizer = optim.SGD(net.parameters(), lr=0.01, weight_decay=0.0001, momentum=0.0)
 
   for epoch in range(100):
     print('Epoch {}/{}'.format(epoch, 100 - 1))
@@ -48,6 +48,8 @@ if __name__ == "__main__":
       net_output = net.forward(x, device)
 
       net_output = net_output[:,-1,:]
+
+      print(net_output)
 
       loss = F.cross_entropy(net_output, y, reduction='none')
 
@@ -73,12 +75,9 @@ if __name__ == "__main__":
     # Validation
     predicted_l = []
     true_l = []
-    """
-    for index_batch, (x, y, valid) in enumerate(validation_dataloader):
-      # Remove batch 1 dimension
-      x = x.view(x.size()[1], x.size()[2], x.size()[3])
-      y = y.view(y.size()[1])
-      # valid = valid.view(valid.size()[1])
+
+    for index_batch, (x, y,) in enumerate(validation_dataloader):
+
 
       x, y = x.to(device), y.to(device)
 
@@ -88,8 +87,8 @@ if __name__ == "__main__":
       predicted_l.append(predicted_roles.detach().cpu().numpy())
       true_l.append(y[-args.n_players:].detach().cpu().numpy())
 
+    print(predicted_l)
     print(compute_random_accuracy.compute_2class_stats(np.array(true_l).flatten(), np.array(predicted_l).flatten()))
-    """
 
 
 
