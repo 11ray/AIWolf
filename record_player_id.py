@@ -1,4 +1,5 @@
 import pandas as pd
+import os
 
 def get_id(lines,n_players):
     r = []
@@ -16,7 +17,7 @@ def get_id(lines,n_players):
 def generate_player_game_list(basename,agent_id,values):
     with open(basename+"/" + agent_id + ".set" ,'w') as f:
         for game,id in values:
-            print( ";".join([game,id]),file=f)
+            print( ",".join([os.path.abspath(basename+game),id]),file=f)
         
 if __name__ == "__main__":
     agent_dataset_dict = {}
@@ -36,10 +37,10 @@ if __name__ == "__main__":
 
 
             except Exception as e:
-                print("Problem generating ",str(i).zfill(3),'/',str(j).zfill(3))
+                print("Problem generating ",str(i).zfill(3),'_',str(j).zfill(3))
                 print(e)
 
     for agent_id in list(agent_dataset_dict.keys()):
         if not agent_id.startswith('Dummy'):
-            generate_player_game_list('data/gat2017log15_data',agent_id,agent_dataset_dict[agent_id])
+            generate_player_game_list('data/gat2017log15_data/',agent_id,agent_dataset_dict[agent_id])
 
