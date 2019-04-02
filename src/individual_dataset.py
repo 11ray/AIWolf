@@ -1,7 +1,16 @@
 import torch
 import torch.utils.data as data
+import torch.nn as nn
 import pandas as pd
 import numpy as np
+
+
+def my_collate(batch):
+    xs = [item[0] for item in batch]
+    ys = [item[1] for item in batch]
+    X = nn.utils.rnn.pad_sequence(xs,batch_first=True)
+    Y = torch.stack(ys,0)
+    return [X, Y]
 
 class IndividualWerewolfDataset(data.Dataset):
     """Werewolf dataset."""
@@ -30,7 +39,7 @@ class IndividualWerewolfDataset(data.Dataset):
             y = torch.from_numpy(np.array([self.compress_classes(xi) for xi in tmp])).long()
 
         else:
-            y = torch.from_numpy(np.array(np.load(basename + ".y.npy")[row-1])).long()
+            y = torch.tensor(np.load(basename + ".y.npy")[row-1]).long()
 
 
         return (x,y)

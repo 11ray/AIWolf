@@ -13,7 +13,6 @@ class Net(nn.Module):
 
     def forward(self, x,device):
         # Receives as input a  Tensor of shape (Batch,Steps,N_features)
-
         i, _ = self.rnn(x)
         out = self.output_layer(i)
 

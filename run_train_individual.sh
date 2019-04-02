@@ -1,4 +1,4 @@
-python train_individual.py --event_vector_size 36 \
+python -m torch.utils.bottleneck train_individual.py --event_vector_size 36 \
 --rnn_hidden_size 128 \
 --classifier_hidden_size 32 \
 --encoder_type rnn_selfattention \
@@ -7,8 +7,8 @@ python train_individual.py --event_vector_size 36 \
 --n_roles 6 \
 --train_file_list data/gat2017log15_data/wasabi.train_10000.set \
 --validation_file_list data/gat2017log15_data/wasabi.test_1000.set \
---update_frequency 64 \
+--update_frequency 1 \
 --loss_scale last_step_only \
---loss_weights uniform \
---gpu_device_number 0 \
---log_frequency 100
+--loss_weights inverse_frequency \
+--gpu_device_number 1 \
+--log_frequency 100 \

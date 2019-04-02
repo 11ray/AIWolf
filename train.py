@@ -54,8 +54,8 @@ if __name__ == "__main__":
 
     optimizer = optim.SGD(net.parameters(), lr=0.01, weight_decay=0.001, momentum=0.0)
 
-    for epoch in range(10000):
-        print('Epoch {}/{}'.format(epoch, 10000 - 1))
+    for epoch in range(1):
+        print('Epoch {}/{}'.format(epoch, 1 - 1))
         print('-' * 10)
 
         #Training
