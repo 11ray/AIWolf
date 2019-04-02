@@ -67,4 +67,4 @@ def compute_baseline_2():
     #compute_2class_stats(roles,[0]*15)
 
 
-
+compute_baselines_15()

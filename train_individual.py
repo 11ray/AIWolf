@@ -48,7 +48,8 @@ if __name__ == "__main__":
     # Training
     optimizer.zero_grad()
     epoch_cost = 0
-    for index_batch, (x, y) in enumerate(train_dataloader):
+    index_batch = 0
+    for (x, y) in train_dataloader:
 
       x, y = x.to(device), y.to(device)
 
@@ -61,20 +62,20 @@ if __name__ == "__main__":
       cost = loss / args.update_frequency
 
       # Logging
-      epoch_cost += cost.detach().cpu().numpy()
+      #epoch_cost += cost.detach().cpu().numpy()
 
       cost.backward()
 
       if (index_batch + 1) % args.update_frequency == 0:
         if args.update_frequency > 0 and (index_batch + 1) % (args.update_frequency * args.log_frequency) == 0:
-          print('Train Epoch: {} [{}/{} ({:.0f}%)]\tCost: {:.6f}'.format(epoch, index_batch, len(train_dataloader),
-                                                                         100. * index_batch / len(train_dataloader),
-                                                                         cost.item()))
+          #print('Train Epoch: {} [{}/{} ({:.0f}%)]\tCost: {:.6f}'.format(epoch, index_batch, len(train_dataloader), 00. * index_batch / len(train_dataloader),cost.item()))
           #print('Network output: ', net_output[-x.size()[0]:, :].argmax(dim=1).detach().cpu().numpy())
           #print(', target:       ', y[-x.size()[0]:].cpu().numpy())
+          continue
         optimizer.step()
         optimizer.zero_grad()
 
+    index_batch += 1
     print("Train cost/batch :", epoch_cost / len(train_dataloader))
 
     # Validation
