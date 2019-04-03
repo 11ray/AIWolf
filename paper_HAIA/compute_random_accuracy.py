@@ -23,6 +23,8 @@ def compute_baselines_15():
     print(correct / (n_repetitions*15))
     print("F1 macro:")
     print(f1_score(np.array(true_l).flatten(),np.array(predicted_l).flatten(),average='macro'))
+    print("F1 micro:")
+    print(f1_score(np.array(true_l).flatten(), np.array(predicted_l).flatten(), average='micro'))
 
 
 
