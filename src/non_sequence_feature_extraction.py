@@ -22,10 +22,10 @@ def get_which_feature_is(x):
     return None
 
 
-def extract_features(X):
+def extract_features(X,retain_factor=1.0):
   # X is (Seq_len, vector_event_size)
   result_arr = np.zeros((1, number_features))
-  for i in range(X.shape[0]):
+  for i in range(int(X.shape[0]*retain_factor)):
     feat = get_which_feature_is(X[i][:])
 
     if feat != None:
@@ -34,7 +34,7 @@ def extract_features(X):
 
 
 
-def get_X_Y(file):
+def get_X_Y(file,retain_factor=1.0):
   with open(file) as f:
     X = []
     Y = []
@@ -42,9 +42,7 @@ def get_X_Y(file):
       (file,player_id) = line.split(",")
       x = np.load(file+".x.npy")[int(player_id)-1][:][:]
       y = np.load(file+".y.npy")[int(player_id)-1]
-      features = extract_features(x)
-
-
+      features = extract_features(x,retain_factor)
 
       X.append(features)
       Y.append(y)
