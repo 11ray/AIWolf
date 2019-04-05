@@ -49,7 +49,7 @@ def request(text):
 # 5
 def because(premise, conclusion):
 
-    if len(premise > 1):
+    if len(premise) > 1:
         support = '(AND '
         for text in premise:
             support = support + '('+ text +')'
@@ -57,7 +57,7 @@ def because(premise, conclusion):
     else:
         support = '('+premise[0]+')'
 
-    if len(conclusion > 1):
+    if len(conclusion) > 1:
         claim = '(XOR '
         for text in conclusion:
             claim = claim + '('+ text + ')'

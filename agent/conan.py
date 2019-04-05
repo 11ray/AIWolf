@@ -24,6 +24,12 @@ class conan(object):
         self.role_vector = [] # list of players most probable roles
         self.role = base_info["myRole"]
         self.current_target = None
+        # list of arguments (BECAUSE) stated
+        self.arguments = []
+        # Target agent of the day
+        self.dayTarget = None
+        # Target agent for werewolf attack
+        self.nightTarget = None
 
         self.updatePlayerMap(base_info)
 
@@ -100,26 +106,23 @@ class conan(object):
             if self.role != "POSSESSED":
                 arg = self.scoreArgs(self.arguments)
                 target = self.processArgument(arg)
-
                 return target
             elif self.role == "POSSESSED":
                 for agent, value in self.player_map.items():
                     if self.player_map[agent]["dangerous_agent"] == True:
-
                         return int(agent)
 
         # For WW team vote any agent tagged as dangerous
         else:
             for agent, value in self.player_map.items():
                 if self.player_map[agent]["dangerous_agent"] == True:
-
                     return int(agent)
 
         # If there are no argument(VLL team) or there are no dangerous agents(WW team) pick random target
         ids = []
         for key,value in self.base_info["statusMap"].items():
-    	       if value == "ALIVE" and int(key) != self.id and key not in self.base_info["roleMap"].keys():
-    		             ids.append(int(key))
+            if value == "ALIVE" and int(key) != self.id and key not in self.base_info["roleMap"].keys():
+                ids.append(int(key))
 
         target = random.choice(ids)
         return target
@@ -132,14 +135,14 @@ class conan(object):
         else:
             ids = []
             for key,value in self.base_info["statusMap"].items():
-        	       if (value == "ALIVE") and (key not in self.base_info["roleMap"].keys()):
-        		             ids.append(int(key))
+                if (value == "ALIVE") and (key not in self.base_info["roleMap"].keys()):
+                    ids.append(int(key))
 
             return random.choice(ids)
 
     def divine(self):
         #print("Making a divination: ")
-        for agent, value in self.player_map:
+        for agent in self.player_map:
             if len(self.player_map[agent]["lies"]) > 0:
                 return int(agent)
 
@@ -152,7 +155,7 @@ class conan(object):
 
     def guard(self):
         #print("Guarding: ")
-        for agent, value in self.player_map:
+        for agent in self.player_map:
             if len(self.player_map[agent]["lies"]) == 0:
                 return int(agent)
 
@@ -265,11 +268,8 @@ class conan(object):
     def processArgument(self, argument):
         source_id = argument[0]
         text = argument[1]
-        cl = text.split()
-        claim = cl[2]
-        targets = re.findall("\[(.*?)\]", claim)
-        for target in targets:
-            return target
+        targets = re.findall("\[(.*?)\]", text)
+        return targets[len(targets)-1]
 
     def retrieveLies(self):
         for agent, val in self.player_map.items():
