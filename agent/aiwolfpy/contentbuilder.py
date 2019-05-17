@@ -8,10 +8,10 @@ def comingout(target, role):
 # 2.2
 def divine(target):
     return 'DIVINE Agent[' + "{0:02d}".format(target) + ']'
-    
+
 def guard(target):
     return 'GUARD Agent[' + "{0:02d}".format(target) + ']'
-    
+
 def vote(target):
     return 'VOTE Agent[' + "{0:02d}".format(target) + ']'
 
@@ -29,11 +29,11 @@ def guarded(target):
     return 'GUARDED Agent[' + "{0:02d}".format(target) + ']'
 
 # 2.4
-def agree(talktype, day, id):
-    return 'AGREE '+ talktype + ' DAY' + str(day) + ' ID:' + str(id)
+def agree(message):
+    return 'AGREE '+ message
 
-def disagree(talktype, day, id):
-    return 'DISAGREE '+ talktype + ' DAY' + str(day) + ' ID:' + str(id)
+def disagree(message):
+    return 'DISAGREE '+ message
 
 # 2.5
 def skip():
@@ -48,23 +48,24 @@ def request(text):
 
 # 5
 def because(premise, conclusion):
+    pr = premise.split()
 
-    if len(premise) > 1:
+    if len(pr) > 1:
         support = '(AND '
-        for text in premise:
+        for text in pr:
             support = support + '('+ text +')'
         support = support + ')'
     else:
-        support = '('+premise[0]+')'
+        support = '('+pr[0]+')'
+    co = conclusion.split()
 
-    if len(conclusion) > 1:
+    if len(co) > 1:
         claim = '(XOR '
-        for text in conclusion:
+        for text in co:
             claim = claim + '('+ text + ')'
         claim = claim + ')'
 
     else:
-        claim = '('+conclusion[0]+')'
+        claim = '('+co[0]+')'
 
     return 'BECAUSE '+ support + claim
-
