@@ -68,6 +68,7 @@ class conan(object):
                 t = lie[0]
                 m = lie[1]
                 talk = cb.because(m, cb.vote(t))
+                print('My argument: ', talk)
             else:
                 talk = cb.skip()
 
@@ -79,6 +80,7 @@ class conan(object):
                 t = lie[0]
                 m = lie[1]
                 talk = cb.because(m, cb.vote(t))
+                print('My argument: ', talk)
             else:
                 talk = cb.skip()
 
@@ -271,6 +273,7 @@ class conan(object):
                 msg = argument[1].split()
                 if "VOTE" in msg[2] or ("ESTIMATE" in msg[2] and "WEREWOLF" in msg[2]):
                     bestArg = argument
+
 
         print('Winning Argument:', bestArg)
         print('Score:', max_score)

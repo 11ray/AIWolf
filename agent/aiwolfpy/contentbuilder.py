@@ -48,24 +48,8 @@ def request(text):
 
 # 5
 def because(premise, conclusion):
-    pr = premise.split()
 
-    if len(pr) > 1:
-        support = '(AND '
-        for text in pr:
-            support = support + '('+ text +')'
-        support = support + ')'
-    else:
-        support = '('+pr[0]+')'
-    co = conclusion.split()
-
-    if len(co) > 1:
-        claim = '(XOR '
-        for text in co:
-            claim = claim + '('+ text + ')'
-        claim = claim + ')'
-
-    else:
-        claim = '('+co[0]+')'
+    support = '('+premise+')'
+    claim = '('+conclusion+')'
 
     return 'BECAUSE '+ support + claim
