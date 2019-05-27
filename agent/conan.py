@@ -108,9 +108,10 @@ class conan(object):
         # For VLL team vote the high score argument with vote or estimate as claim
         if (self.role != "WEREWOLF") and len(self.arguments) > 0:
             if self.role != "POSSESSED":
-                arg = self.scoreArgs(self.arguments)
-                target = self.processArgument(arg)
-                return target
+                target = self.scoreArgs(self.arguments)
+                #target = self.processArgument(arg)
+                if target != None:
+                    return target
             elif self.role == "POSSESSED":
                 for agent, value in self.player_map.items():
                     if self.player_map[agent]["dangerous_agent"] == True:
@@ -253,37 +254,46 @@ class conan(object):
 
     def scoreArgs(self, argument_list):
         # an argument is a tuple (agent, text)
-
         max_score = 0
         bestArg = argument_list[0]
+        print('My id: ', self.id)
+        scores = {}
         for argument in argument_list:
             # norm. score based in the number of lies
 
             print(argument)
 
             if argument[0] == self.id:
-                score = 1.5
+                score = 2
 
             elif len(self.player_map[argument[0]]["lies"]) > 0:
                 score = 1/(len(self.player_map[argument[0]]["lies"])+1)
             else:
                 score = 1
-            if score > max_score:
-                max_score = score
-                msg = argument[1].split()
-                if "VOTE" in msg[2] or ("ESTIMATE" in msg[2] and "WEREWOLF" in msg[2]):
-                    bestArg = argument
 
+            text = argument[1]
+            msg = argument[1].split(') (')
+            print('mesaji: ', msg)
+            if "VOTE" in msg[len(msg)-1] or ("ESTIMATE" in msg[len(msg)-1] and "WEREWOLF" in msg[len(msg)-1]) or (("ESTIMATE" in msg[len(msg)-1] and "POSSESSED" in msg[len(msg)-1])):
 
-        print('Winning Argument:', bestArg)
+                targets = re.findall("\[(.*?)\]", text)
+                target_arg = targets[len(targets)-1]
+                if target_arg not in scores:
+                    scores[target_arg] = score
+                else:
+                    scores[target_arg] += score
+            else:
+                target = None
+
+        for ag in scores:
+            if scores[ag] > max_score:
+                target = ag
+                max_score = scores[ag]
+
+        print('Scores: ', scores)
+        print('Target Agent:', target)
         print('Score:', max_score)
-        return bestArg
-
-    def processArgument(self, argument):
-        source_id = argument[0]
-        text = argument[1]
-        targets = re.findall("\[(.*?)\]", text)
-        return targets[len(targets)-1]
+        return target
 
     def retrieveLies(self):
         for agent, val in self.player_map.items():
@@ -302,6 +312,14 @@ class conan(object):
                 lie = None
 
         return lie
+
+'''
+    def processArgument(self, argument):
+        source_id = argument[0]
+        text = argument[1]
+        targets = re.findall("\[(.*?)\]", text)
+        return targets[len(targets)-1]
+'''
 
 def parseArgs(args):
     usage = "usage: %prog [options]"

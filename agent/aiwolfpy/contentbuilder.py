@@ -52,4 +52,4 @@ def because(premise, conclusion):
     support = '('+premise+')'
     claim = '('+conclusion+')'
 
-    return 'BECAUSE '+ support + claim
+    return 'BECAUSE '+ support +' '+ claim
