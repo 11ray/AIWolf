@@ -69,6 +69,9 @@ class conan(object):
                 m = lie[1]
                 talk = cb.because(m, cb.vote(t))
                 print('My argument: ', talk)
+            elif self.already_co == False:
+                talk = cb.comingout(self.id, 'VILLAGER')
+                self.already_co = True
             else:
                 talk = cb.skip()
 
@@ -81,6 +84,9 @@ class conan(object):
                 m = lie[1]
                 talk = cb.because(m, cb.vote(t))
                 print('My argument: ', talk)
+            elif self.already_co == False:
+                talk = cb.comingout(self.id, 'VILLAGER')
+                self.already_co = True
             else:
                 talk = cb.skip()
 
@@ -237,6 +243,11 @@ class conan(object):
                 if "ESTIMATE" in text:
                     if len(t) == 3:
                         if ("{:02d}".format(self.id) in t[1]) and (self.role != t[2]):
+                            self.player_map[agent]["lies"].append([agent, text])
+
+                if "VOTE" in text:
+                    if len(t) == 3:
+                        if ("{:02d}".format(self.id) in t[1]):
                             self.player_map[agent]["lies"].append([agent, text])
 
                 # Si soy del equipo WW y han acertado mi rol, me guardo el mensaje para construir argumentos en contra
